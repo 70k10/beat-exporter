@@ -10,7 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// SetupServiceListener setups singal handler
+// SetupServiceListener setup signal handler
 func SetupServiceListener(stopCh chan<- bool, serviceName string, logger log.StdLogger) error {
 	go func() {
 		sigs := make(chan os.Signal, 1)

@@ -15,7 +15,6 @@ type BeatInfo struct {
 
 //Stats stats endpoint json structure
 type Stats struct {
-	System     System      `json:"system"`
 	Beat       BeatStats   `json:"beat"`
 	LibBeat    LibBeat     `json:"libbeat"`
 	Registrar  Registrar   `json:"registrar"`

@@ -41,8 +41,6 @@ Configuration reference
 ```
 $ ./beat-exporter -help
 Usage of ./beat-exporter:
-  -beat.system
-    	Expose system stats
   -beat.timeout duration
     	Timeout for trying to get stats from beat. (default 10s)
   -beat.uri string
