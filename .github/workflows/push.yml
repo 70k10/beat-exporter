@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Set up Go 1.13
+    - name: Set up Go 1.16
       uses: actions/setup-go@v1
       with:
-        go-version: 1.13
+        go-version: 1.16
       id: go
 
     - name: Check out code into the Go module directory
@@ -31,23 +31,3 @@ jobs:
       with:
         name: binaries
         path: .build
-
-  dockerimage:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
-      with:
-          fetch-depth: 1      
-
-    - name: Download artifact
-      uses: actions/download-artifact@v1.0.0
-      with:
-        name: binaries
-        path: .build
-    
-    - name: Build docker image
-      run: |
-        docker build . -t trustpilot/beat-exporter
-
