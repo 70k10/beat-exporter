@@ -27,8 +27,16 @@ type BeatStats struct {
 			MS float64 `json:"ms"`
 		} `json:"uptime"`
 
-		EmphemeralID string `json:"emphemeral_id"`
+		EphemeralID string `json:"ephemeral_id"`
 	} `json:"info"`
+
+	Handles struct {
+		Limit struct {
+			Hard float64 `json:"hard"`
+			Soft float64 `json:"soft"`
+		} `json:"limit"`
+		Open float64 `json:"open"`
+	} `json:"handles"`
 
 	Memstats struct {
 		GCNext      float64 `json:"gc_next"`
@@ -99,6 +107,55 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
 					"beat.info.uptime.ms",
 				    nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+				),
+				eval: func(stats *Stats) float64 {
+					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()
+				},
+				valType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "handles", "limit"),
+					"beat.handles.limit",
+					nil, prometheus.Labels{"limit":"hard", "collector": beatInfo.CollectorLabel},
+				),
+				eval: func(stats *Stats) float64 { return stats.Beat.Handles.Limit.Hard },
+				valType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "handles", "limit"),
+					"beat.handles.limit",
+					nil, prometheus.Labels{"limit":"soft", "collector": beatInfo.CollectorLabel},
+				),
+				eval: func(stats *Stats) float64 { return stats.Beat.Handles.Limit.Soft },
+				valType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "handles", "open"),
+					"beat.handles.open",
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+				),
+				eval: func(stats *Stats) float64 { return stats.Beat.Handles.Open },
+				valType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
+					"beat.info.uptime.ms",
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+				),
+				eval: func(stats *Stats) float64 {
+					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()
+				},
+				valType: prometheus.CounterValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
+					"beat.info.uptime.ms",
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()

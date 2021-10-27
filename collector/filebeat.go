@@ -27,6 +27,13 @@ type Filebeat struct {
 				Truncated float64 `json:"truncated"`
 			} `json:"files"`
 		} `json:"log"`
+		Netflow struct {
+			Flows float64 `json:"flows"`
+			Packets struct {
+			    Dropped float64 `json:"dropped"`
+				Received float64 `json:"received"`
+			} `json:"packets"`
+		} `json:"netflow"`
 	} `json:"input"`
 }
 
@@ -130,6 +137,33 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 					nil, prometheus.Labels{"files": "truncated", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Log.Files.Truncated },
+				valType: prometheus.UntypedValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow_flows"),
+					"filebeat.input_netflow",
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+				),
+				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Flows },
+				valType: prometheus.UntypedValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow"),
+					"filebeat.input_netflow",
+					nil, prometheus.Labels{"packets": "dropped", "collector": beatInfo.CollectorLabel},
+				),
+				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Packets.Dropped},
+				valType: prometheus.UntypedValue,
+			},
+			{
+				desc: prometheus.NewDesc(
+					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow"),
+					"filebeat.input_netflow",
+					nil, prometheus.Labels{"packets": "received", "collector": beatInfo.CollectorLabel},
+				),
+				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Packets.Received},
 				valType: prometheus.UntypedValue,
 			},
 		},
