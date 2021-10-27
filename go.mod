@@ -1,4 +1,4 @@
-module github.com/trustpilot/beat-exporter
+module github.com/70k10/beat-exporter
 
 go 1.16
 

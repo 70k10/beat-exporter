@@ -1,9 +1,6 @@
-# beat-exporter for Prometheus ![](https://github.com/trustpilot/beat-exporter/workflows/test-and-build/badge.svg)
+# beat-exporter for Prometheus ![](https://github.com/70k10/beat-exporter/workflows/test-and-build/badge.svg)
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/trustpilot/beat-exporter.svg?maxAge=604800)](https://hub.docker.com/r/trustpilot/beat-exporter/)
-
-
-Exposes (file|metric)beat statistics from beats statistics endpoint to prometheus format, automaticly configuring collectors for apporiate beat type.
+Exposes multiple instances of (file|metric)beat statistics from beats statistics endpoint to prometheus format, automatically configuring collectors for appropriate beat type.
 
 Current coverage
 -
