@@ -34,7 +34,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "writes"),
 					"registrar.writes",
-					nil, prometheus.Labels{"writes": "fail"},
+					nil, prometheus.Labels{"writes": "fail", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.Writes.Fail },
 				valType: prometheus.GaugeValue,
@@ -43,7 +43,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "writes"),
 					"registrar.writes",
-					nil, prometheus.Labels{"writes": "success"},
+					nil, prometheus.Labels{"writes": "success", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.Writes.Success },
 				valType: prometheus.GaugeValue,
@@ -52,7 +52,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "writes"),
 					"registrar.writes",
-					nil, prometheus.Labels{"writes": "total"},
+					nil, prometheus.Labels{"writes": "total", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.Writes.Total },
 				valType: prometheus.GaugeValue,
@@ -61,7 +61,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "states"),
 					"registrar.states",
-					nil, prometheus.Labels{"state": "cleanup"},
+					nil, prometheus.Labels{"state": "cleanup", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.States.Cleanup },
 				valType: prometheus.GaugeValue,
@@ -70,7 +70,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "states"),
 					"registrar.states",
-					nil, prometheus.Labels{"state": "current"},
+					nil, prometheus.Labels{"state": "current", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.States.Current },
 				valType: prometheus.GaugeValue,
@@ -79,7 +79,7 @@ func NewRegistrarCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collecto
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "registrar", "states"),
 					"registrar.states",
-					nil, prometheus.Labels{"state": "update"},
+					nil, prometheus.Labels{"state": "update", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Registrar.States.Update },
 				valType: prometheus.GaugeValue,

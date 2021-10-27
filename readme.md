@@ -36,22 +36,25 @@ Point your Prometheus to `0.0.0.0:9479/metrics`
 Configuration reference
 -
 ```
-$ ./beat-exporter -help
+$ ./beat-exporter --help
 Usage of ./beat-exporter:
   -beat.timeout duration
-    	Timeout for trying to get stats from beat. (default 10s)
+        Timeout for trying to get stats from beat. (default 10s)
   -beat.uri string
-    	HTTP API address of beat. (default "http://localhost:5066")
+        HTTP API address of beat.
+        Comma-separated for multiple URIs. Ex. "http://localhost:5066,http://localhost:5067"
+        Append semi-colon to URI followed by a name to modify the collector label. Ex. "http://localhost:5066;servicefilebeat"
+         (default "http://localhost:5066")
   -tls.certfile string
-    	TLS certs file if you want to use tls instead of http
+        TLS certs file if you want to use tls instead of http
   -tls.keyfile string
-    	TLS key file if you want to use tls instead of http
+        TLS key file if you want to use tls instead of http
   -version
-    	Show version and exit
+        Show version and exit
   -web.listen-address string
-    	Address to listen on for web interface and telemetry. (default ":9479")
+        Address to listen on for web interface and telemetry. (default ":9479")
   -web.telemetry-path string
-    	Path under which to expose metrics. (default "/metrics")
+        Path under which to expose metrics. (default "/metrics")
 ```
 
 Contribution

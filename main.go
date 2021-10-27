@@ -18,8 +18,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/version"
-	"github.com/trustpilot/beat-exporter/collector"
-	"github.com/trustpilot/beat-exporter/internal/service"
+	"github.com/70k10/beat-exporter/collector"
+	"github.com/70k10/beat-exporter/internal/service"
 )
 
 const (
@@ -33,7 +33,9 @@ func main() {
 		tlsCertFile   = flag.String("tls.certfile", "", "TLS certs file if you want to use tls instead of http")
 		tlsKeyFile    = flag.String("tls.keyfile", "", "TLS key file if you want to use tls instead of http")
 		metricsPath   = flag.String("web.telemetry-path", "/metrics", "Path under which to expose metrics.")
-		beatURI       = flag.String("beat.uri", "http://localhost:5066", "HTTP API address of beat. Comma-separated for multiple URIs.")
+		beatURI       = flag.String("beat.uri", "http://localhost:5066", "HTTP API address of beat.\n" +
+			"Comma-separated for multiple URIs. Ex. \"http://localhost:5066,http://localhost:5067\"\n" +
+			"Append semi-colon to URI followed by a name to modify the collector label. Ex. \"http://localhost:5066;servicefilebeat\"\n")
 		beatTimeout   = flag.Duration("beat.timeout", 10*time.Second, "Timeout for trying to get stats from beat.")
 		showVersion   = flag.Bool("version", false, "Show version and exit")
 	)
@@ -65,10 +67,13 @@ func main() {
 	registry := prometheus.NewRegistry()
 	versionMetric := version.NewCollector(Name)
 	registry.MustRegister(versionMetric)
-
-	var beatInfo *collector.BeatInfo
+	var (
+		beatInfo *collector.BeatInfo
+		collectorLabel string
+	)
 	for _, URI := range strings.Split(*beatURI,",") {
 		if len(URI) > 0 {
+			URI, collectorLabel = parseCollectorLabel(URI)
 			parsedURL, err := url.Parse(URI)
 			if err != nil {
 				log.Fatalf("failed to parse beat.uri, error: %v", err)
@@ -97,7 +102,7 @@ func main() {
 			for {
 				select {
 				case <-t.C:
-					beatInfo, err = loadBeatType(httpClient, *parsedURL)
+					beatInfo, err = loadBeatType(httpClient, *parsedURL, collectorLabel)
 					if err != nil {
 						log.Errorf("Could not load beat type, with error: %v, retrying in 1s", err)
 						continue
@@ -187,8 +192,15 @@ func IndexHandler(metricsPath string) http.HandlerFunc {
 	}
 }
 
-func loadBeatType(client *http.Client, url url.URL) (*collector.BeatInfo, error) {
-	beatInfo := &collector.BeatInfo{}
+func parseCollectorLabel(URI string) (string,string) {
+	splitURIandLabel := strings.Split(URI,";")
+	if len(splitURIandLabel) > 1 && len(splitURIandLabel[1]) > 0 {
+		return splitURIandLabel[0], splitURIandLabel[1]
+	}
+	return splitURIandLabel[0], ""
+}
+func loadBeatType(client *http.Client, url url.URL, collectorLabel string) (*collector.BeatInfo, error) {
+	beatInfo := &collector.BeatInfo{CollectorLabel: collectorLabel}
 
 	response, err := client.Get(url.String())
 	if err != nil {

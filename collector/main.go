@@ -29,7 +29,9 @@ var HackfixRegex = regexp.MustCompile("\"time\":(\\d+)") // replaces time:123 to
 
 // NewMainCollector constructor
 func NewMainCollector(client *http.Client, url *url.URL, name string, beatInfo *BeatInfo) prometheus.Collector {
-	instance := fmt.Sprintf("%s:%s", url.Hostname(), url.Port())
+	if beatInfo.CollectorLabel == "" {
+		beatInfo.CollectorLabel = fmt.Sprintf("%s:%s", url.Hostname(), url.Port())
+	}
 	beat := &mainCollector{
 		Collectors: make(map[string]prometheus.Collector),
 		Stats:      &Stats{},
@@ -40,12 +42,12 @@ func NewMainCollector(client *http.Client, url *url.URL, name string, beatInfo *
 			prometheus.BuildFQName(name, "target", "info"),
 			"target information",
 			nil,
-			prometheus.Labels{"version": beatInfo.Version, "beat": beatInfo.Beat, "uri": instance}),
+			prometheus.Labels{"version": beatInfo.Version, "beat": beatInfo.Beat, "collector": beatInfo.CollectorLabel}),
 		targetUp: prometheus.NewDesc(
 			prometheus.BuildFQName("", beatInfo.Beat, "up"),
 			"Target up",
 			nil,
-			nil),
+			prometheus.Labels{"collector": beatInfo.CollectorLabel}),
 
 		beatInfo:   beatInfo,
 		metrics:    exportedMetrics{},

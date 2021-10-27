@@ -58,7 +58,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "cpu_time", "seconds_total"),
 					"beat.cpu.time",
-					nil, prometheus.Labels{"mode": "system"},
+					nil, prometheus.Labels{"mode": "system", "collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return (time.Duration(stats.Beat.CPU.System.Time.MS) * time.Millisecond).Seconds()
@@ -69,7 +69,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "cpu_time", "seconds_total"),
 					"beat.cpu.time",
-					nil, prometheus.Labels{"mode": "user"},
+					nil, prometheus.Labels{"mode": "user", "collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return (time.Duration(stats.Beat.CPU.User.Time.MS) * time.Millisecond).Seconds()
@@ -80,7 +80,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "cpu", "ticks_total"),
 					"beat.cpu.ticks",
-					nil, prometheus.Labels{"mode": "system"},
+					nil, prometheus.Labels{"mode": "system", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Beat.CPU.System.Ticks },
 				valType: prometheus.CounterValue,
@@ -89,7 +89,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "cpu", "ticks_total"),
 					"beat.cpu.ticks",
-					nil, prometheus.Labels{"mode": "user"},
+					nil, prometheus.Labels{"mode": "user", "collector": beatInfo.CollectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Beat.CPU.User.Ticks },
 				valType: prometheus.CounterValue,
@@ -98,7 +98,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
 					"beat.info.uptime.ms",
-					nil, nil,
+				    nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()
@@ -109,7 +109,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "memstats", "gc_next_total"),
 					"beat.memstats.gc_next",
-					nil, nil,
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Beat.Memstats.GCNext
@@ -120,7 +120,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "memstats", "memory_alloc"),
 					"beat.memstats.memory_alloc",
-					nil, nil,
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Beat.Memstats.MemoryAlloc
@@ -131,7 +131,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "memstats", "memory"),
 					"beat.memstats.memory_total",
-					nil, nil,
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Beat.Memstats.MemoryTotal
@@ -142,7 +142,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "memstats", "rss"),
 					"beat.memstats.rss",
-					nil, nil,
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Beat.Memstats.RSS
@@ -153,7 +153,7 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "runtime", "goroutines"),
 					"beat.runtime.goroutines",
-					nil, nil,
+					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return float64(stats.Beat.Runtime.Goroutines)
