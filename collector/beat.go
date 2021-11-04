@@ -104,17 +104,6 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 			},
 			{
 				desc: prometheus.NewDesc(
-					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
-					"beat.info.uptime.ms",
-				    nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
-				),
-				eval: func(stats *Stats) float64 {
-					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()
-				},
-				valType: prometheus.CounterValue,
-			},
-			{
-				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "handles", "limit"),
 					"beat.handles.limit",
 					nil, prometheus.Labels{"limit":"hard", "collector": beatInfo.CollectorLabel},
@@ -138,17 +127,6 @@ func NewBeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
 				),
 				eval: func(stats *Stats) float64 { return stats.Beat.Handles.Open },
-				valType: prometheus.CounterValue,
-			},
-			{
-				desc: prometheus.NewDesc(
-					prometheus.BuildFQName(beatInfo.Beat, "uptime", "seconds_total"),
-					"beat.info.uptime.ms",
-					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
-				),
-				eval: func(stats *Stats) float64 {
-					return (time.Duration(stats.Beat.BeatUptime.Uptime.MS) * time.Millisecond).Seconds()
-				},
 				valType: prometheus.CounterValue,
 			},
 			{
