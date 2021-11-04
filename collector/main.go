@@ -24,9 +24,6 @@ type mainCollector struct {
 	metrics    exportedMetrics
 }
 
-// HackfixRegex regex to replace JSON part
-var HackfixRegex = regexp.MustCompile("\"time\":(\\d+)") // replaces time:123 to time.ms:123, only filebeat has different naming of time metric
-
 // NewMainCollector constructor
 func NewMainCollector(client *http.Client, url *url.URL, name string, beatInfo *BeatInfo) prometheus.Collector {
 	if beatInfo.CollectorLabel == "" {
@@ -136,9 +133,6 @@ func (b *mainCollector) fetchStatsEndpoint() error {
 		log.Error("Can't read body of response")
 		return err
 	}
-
-	// @TODO remove this when filebeat stats endpoint output matches all other beats output
-	bodyBytes = HackfixRegex.ReplaceAll(bodyBytes, []byte("\"time\":{\"ms\":$1}"))
 
 	err = json.Unmarshal(bodyBytes, &b.Stats)
 	if err != nil {
