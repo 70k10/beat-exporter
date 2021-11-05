@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"regexp"
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -18,16 +17,17 @@ type mainCollector struct {
 	client     *http.Client
 	beatURL    *url.URL
 	name       string
-	beatInfo   *BeatInfo
 	targetDesc *prometheus.Desc
 	targetUp   *prometheus.Desc
 	metrics    exportedMetrics
+	CollectorLabel string
+	beatInfo   *BeatInfo
 }
 
 // NewMainCollector constructor
-func NewMainCollector(client *http.Client, url *url.URL, name string, beatInfo *BeatInfo) prometheus.Collector {
-	if beatInfo.CollectorLabel == "" {
-		beatInfo.CollectorLabel = fmt.Sprintf("%s:%s", url.Hostname(), url.Port())
+func NewMainCollector(client *http.Client, url *url.URL, name string, collectorLabel string) (string, BeatInfo, prometheus.Collector) {
+	if collectorLabel == "" {
+		collectorLabel = fmt.Sprintf("%s:%s", url.Hostname(), url.Port())
 	}
 	beat := &mainCollector{
 		Collectors: make(map[string]prometheus.Collector),
@@ -35,29 +35,38 @@ func NewMainCollector(client *http.Client, url *url.URL, name string, beatInfo *
 		client:     client,
 		beatURL:    url,
 		name:       name,
-		targetDesc: prometheus.NewDesc(
-			prometheus.BuildFQName(name, "target", "info"),
-			"target information",
-			nil,
-			prometheus.Labels{"version": beatInfo.Version, "beat": beatInfo.Beat, "collector": beatInfo.CollectorLabel}),
-		targetUp: prometheus.NewDesc(
-			prometheus.BuildFQName("", beatInfo.Beat, "up"),
-			"Target up",
-			nil,
-			prometheus.Labels{"collector": beatInfo.CollectorLabel}),
-
-		beatInfo:   beatInfo,
+		CollectorLabel: collectorLabel,
 		metrics:    exportedMetrics{},
+		beatInfo: &BeatInfo{},
 	}
 
-	beat.Collectors["beat"] = NewBeatCollector(beatInfo, beat.Stats)
-	beat.Collectors["libbeat"] = NewLibBeatCollector(beatInfo, beat.Stats)
-	beat.Collectors["registrar"] = NewRegistrarCollector(beatInfo, beat.Stats)
-	beat.Collectors["filebeat"] = NewFilebeatCollector(beatInfo, beat.Stats)
-	beat.Collectors["metricbeat"] = NewMetricbeatCollector(beatInfo, beat.Stats)
-	beat.Collectors["auditd"] = NewAuditdCollector(beatInfo, beat.Stats)
+	err := beat.loadBeatType(client, url)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Errorf("Failed to load beat type (%s): %v", beat.CollectorLabel, err)
+	}
 
-	return beat
+	beat.targetDesc = prometheus.NewDesc(
+		prometheus.BuildFQName(name, "target", "info"),
+		"target information",
+		nil,
+		prometheus.Labels{"version": beat.beatInfo.Version, "beat": beat.beatInfo.Beat, "collector": beat.CollectorLabel})
+
+	beat.targetUp = prometheus.NewDesc(
+		prometheus.BuildFQName("", beat.beatInfo.Beat, "up"),
+		"Target up",
+		nil,
+		prometheus.Labels{"collector": beat.CollectorLabel})
+
+	beat.Collectors["beat"] = NewBeatCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+	beat.Collectors["libbeat"] = NewLibBeatCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+	beat.Collectors["registrar"] = NewRegistrarCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+	beat.Collectors["filebeat"] = NewFilebeatCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+	beat.Collectors["metricbeat"] = NewMetricbeatCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+	beat.Collectors["auditd"] = NewAuditdCollector(beat.beatInfo, beat.Stats, beat.CollectorLabel)
+
+	return collectorLabel, beat.GetCollectorInfo(), beat
 }
 
 // Describe returns all descriptions of the collector.
@@ -141,4 +150,36 @@ func (b *mainCollector) fetchStatsEndpoint() error {
 	}
 
 	return nil
+}
+
+func (b *mainCollector) loadBeatType(client *http.Client, url *url.URL) error {
+	response, err := client.Get(url.String())
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		log.Errorf("Beat URL: %q status code: %d", url.String(), response.StatusCode)
+		return err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Error("Can't read body of response")
+		return err
+	}
+
+	err = json.Unmarshal(bodyBytes, &b.beatInfo)
+	if err != nil {
+		log.Error("Could not parse JSON response for target")
+		return err
+	}
+
+	return nil
+}
+
+func (b *mainCollector) GetCollectorInfo() BeatInfo {
+	bi := BeatInfo{b.beatInfo.Beat, b.beatInfo.Hostname, b.beatInfo.Name, b.beatInfo.UUID, b.beatInfo.Version}
+    return bi
 }

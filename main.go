@@ -60,23 +60,21 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
-		}).Errorf("could not setup service listener: %v", err)
+		}).Errorf("Could not setup service listener: %v", err)
 	}
 
 	// version metric
 	registry := prometheus.NewRegistry()
 	versionMetric := version.NewCollector(Name)
 	registry.MustRegister(versionMetric)
-	var (
-		beatInfo *collector.BeatInfo
-		collectorLabel string
-	)
+	var collectorLabel string
+
 	for _, URI := range strings.Split(*beatURI,",") {
 		if len(URI) > 0 {
 			URI, collectorLabel = parseCollectorLabel(URI)
 			parsedURL, err := url.Parse(URI)
 			if err != nil {
-				log.Fatalf("failed to parse beat.uri, error: %v", err)
+				log.Fatalf("Failed to parse beat.uri, error: %v", err)
 			}
 			httpClient := &http.Client{
 				Timeout: *beatTimeout,
@@ -94,21 +92,21 @@ func main() {
 				}
 			}
 
-			log.WithFields(log.Fields{"URI": URI}).Info("Exploring target for beat type")
+			log.WithFields(log.Fields{"URI": URI}).Info("Validating Beat URI accessible.")
 
 			t := time.NewTicker(1 * time.Second)
 
-		    beatdiscovery:
+		    beatValidation:
 			for {
 				select {
 				case <-t.C:
-					beatInfo, err = loadBeatType(httpClient, *parsedURL, collectorLabel)
+					err = testBeatStats(httpClient, *parsedURL)
 					if err != nil {
-						log.Errorf("Could not load beat type, with error: %v, retrying in 1s", err)
+						log.Errorf("Failed to connect to Beat, with error: %v, retrying in 1s", err)
 						continue
 					}
 
-					break beatdiscovery
+					break beatValidation
 
 				case <-stopCh:
 					os.Exit(0) // signal received, stop gracefully
@@ -117,7 +115,17 @@ func main() {
 
 			t.Stop()
 
-			registry.MustRegister(collector.NewMainCollector(httpClient, parsedURL, Name, beatInfo))
+			parsedCollectorLabel, beatInfo, beatCollector := collector.NewMainCollector(httpClient, parsedURL, Name, collectorLabel)
+			registry.MustRegister(beatCollector)
+
+			log.WithFields(
+				log.Fields{
+					"beat":     beatInfo.Beat,
+					"version":  beatInfo.Version,
+					"name":     beatInfo.Name,
+					"hostname": beatInfo.Hostname,
+					"uuid":     beatInfo.UUID,
+				}).Infof("%s: Target beat configuration loaded successfully!", parsedCollectorLabel)
 		}
 	}
 
@@ -131,16 +139,16 @@ func main() {
 
 	http.HandleFunc("/", IndexHandler(*metricsPath))
 
-	log.WithFields(log.Fields{
-		"addr": *listenAddress,
-	}).Infof("Starting exporter with configured type: %s", beatInfo.Beat)
 
 	go func() {
 		defer func() {
 			stopCh <- true
 		}()
 
-		log.Info("Starting listener")
+		log.WithFields(log.Fields{
+			"addr": *listenAddress,
+		}).Info("Starting listener")
+
 		if *tlsCertFile != "" && *tlsKeyFile != "" {
 			if err := http.ListenAndServeTLS(*listenAddress, *tlsCertFile, *tlsKeyFile, nil); err != nil {
 
@@ -199,40 +207,31 @@ func parseCollectorLabel(URI string) (string,string) {
 	}
 	return splitURIandLabel[0], ""
 }
-func loadBeatType(client *http.Client, url url.URL, collectorLabel string) (*collector.BeatInfo, error) {
-	beatInfo := &collector.BeatInfo{CollectorLabel: collectorLabel}
+
+func testBeatStats(client *http.Client, url url.URL) error {
+	beatInfo := &collector.BeatInfo{}
 
 	response, err := client.Get(url.String())
 	if err != nil {
-		return beatInfo, err
+		return err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		log.Errorf("Beat URL: %q status code: %d", url.String(), response.StatusCode)
-		return beatInfo, err
+		return err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Error("Can't read body of response")
-		return beatInfo, err
+		return err
 	}
 
 	err = json.Unmarshal(bodyBytes, &beatInfo)
 	if err != nil {
 		log.Error("Could not parse JSON response for target")
-		return beatInfo, err
+		return err
 	}
-
-	log.WithFields(
-		log.Fields{
-			"beat":     beatInfo.Beat,
-			"version":  beatInfo.Version,
-			"name":     beatInfo.Name,
-			"hostname": beatInfo.Hostname,
-			"uuid":     beatInfo.UUID,
-		}).Info("Target beat configuration loaded successfully!")
-
-	return beatInfo, nil
+	return nil
 }

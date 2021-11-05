@@ -32,7 +32,7 @@ type metricbeatCollector struct {
 }
 
 // NewMetricbeatCollector constructor
-func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
+func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string) prometheus.Collector {
 	return &metricbeatCollector{
 		beatInfo: beatInfo,
 		stats:    stats,
@@ -41,7 +41,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "cpu"),
 					"system.cpu",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.CPU.Success },
 				valType: prometheus.CounterValue,
@@ -50,7 +50,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "cpu"),
 					"system.cpu",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.CPU.Failures },
 				valType: prometheus.CounterValue,
@@ -59,7 +59,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "filesystem"),
 					"system.filesystem",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Filesystem.Success },
 				valType: prometheus.CounterValue,
@@ -68,7 +68,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "filesystem"),
 					"system.filesystem",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Filesystem.Failures },
 				valType: prometheus.CounterValue,
@@ -77,7 +77,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "fsstat"),
 					"system.fsstat",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Fsstat.Success },
 				valType: prometheus.CounterValue,
@@ -86,7 +86,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "fsstat"),
 					"system.fsstat",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Fsstat.Failures },
 				valType: prometheus.CounterValue,
@@ -95,7 +95,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "load"),
 					"system.load",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Load.Success },
 				valType: prometheus.CounterValue,
@@ -104,7 +104,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "load"),
 					"system.load",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Load.Failures },
 				valType: prometheus.CounterValue,
@@ -113,7 +113,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "memory"),
 					"system.memory",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Memory.Success },
 				valType: prometheus.CounterValue,
@@ -122,7 +122,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "memory"),
 					"system.memory",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Memory.Failures },
 				valType: prometheus.CounterValue,
@@ -131,7 +131,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "network"),
 					"system.network",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Network.Success },
 				valType: prometheus.CounterValue,
@@ -140,7 +140,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "network"),
 					"system.network",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Network.Failures },
 				valType: prometheus.CounterValue,
@@ -149,7 +149,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "process"),
 					"system.process",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Process.Success },
 				valType: prometheus.CounterValue,
@@ -158,7 +158,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "process"),
 					"system.process",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Process.Failures },
 				valType: prometheus.CounterValue,
@@ -167,7 +167,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "process_summary"),
 					"system.process_summary",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.ProcessSummary.Success },
 				valType: prometheus.CounterValue,
@@ -176,7 +176,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "process_summary"),
 					"system.process_summary",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.ProcessSummary.Failures },
 				valType: prometheus.CounterValue,
@@ -185,7 +185,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "uptime"),
 					"system.uptime",
-					nil, prometheus.Labels{"event": "success", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "success", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Uptime.Success },
 				valType: prometheus.CounterValue,
@@ -194,7 +194,7 @@ func NewMetricbeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collect
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "metricbeat_system", "uptime"),
 					"system.uptime",
-					nil, prometheus.Labels{"event": "failures", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "failures", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Metricbeat.System.Uptime.Failures },
 				valType: prometheus.CounterValue,

@@ -6,9 +6,8 @@ import (
 
 //BeatInfo beat info json structure
 type BeatInfo struct {
-	Beat           string `json:"beat"`
-	CollectorLabel string `json:"collectorlabel"`
-	Hostname       string `json:"hostname"`
+	Beat     string `json:"beat"`
+	Hostname string `json:"hostname"`
 	Name     string `json:"name"`
 	UUID     string `json:"uuid"`
 	Version  string `json:"version"`

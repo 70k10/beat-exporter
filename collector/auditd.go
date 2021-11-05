@@ -19,7 +19,7 @@ type auditdCollector struct {
 }
 
 // NewAuditdCollector constructor
-func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
+func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string) prometheus.Collector {
 	return &auditdCollector{
 		beatInfo: beatInfo,
 		stats:    stats,
@@ -28,7 +28,7 @@ func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "auditd", "kernel_lost"),
 					"auditd.kernel_lost",
-					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"collector": collectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Auditd.KernelLost
@@ -39,7 +39,7 @@ func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "auditd", "reassembler_seq_gaps"),
 					"auditd.reassembler_seq_gaps",
-					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"collector": collectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Auditd.ReassemblerSeqGaps
@@ -50,7 +50,7 @@ func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "auditd", "received_msgs"),
 					"auditd.received_msgs",
-					nil,  prometheus.Labels{"collector": beatInfo.CollectorLabel},
+					nil,  prometheus.Labels{"collector": collectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Auditd.ReceivedMsgs
@@ -61,7 +61,7 @@ func NewAuditdCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "auditd", "userspace_lost"),
 					"auditd.userspace_lost",
-					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"collector": collectorLabel},
 				),
 				eval: func(stats *Stats) float64 {
 					return stats.Auditd.UserspaceLost

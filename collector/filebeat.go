@@ -44,7 +44,7 @@ type filebeatCollector struct {
 }
 
 // NewFilebeatCollector constructor
-func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector {
+func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string) prometheus.Collector {
 	return &filebeatCollector{
 		beatInfo: beatInfo,
 		stats:    stats,
@@ -53,7 +53,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "events"),
 					"filebeat.events",
-					nil, prometheus.Labels{"event": "active", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "active", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Events.Active },
 				valType: prometheus.UntypedValue,
@@ -62,7 +62,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "events"),
 					"filebeat.events",
-					nil, prometheus.Labels{"event": "added", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "added", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Events.Added },
 				valType: prometheus.UntypedValue,
@@ -71,7 +71,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "events"),
 					"filebeat.events",
-					nil, prometheus.Labels{"event": "done", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"event": "done", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Events.Done },
 				valType: prometheus.UntypedValue,
@@ -80,7 +80,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "harvester"),
 					"filebeat.harvester",
-					nil, prometheus.Labels{"harvester": "closed", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"harvester": "closed", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Harvester.Closed },
 				valType: prometheus.UntypedValue,
@@ -89,7 +89,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "harvester"),
 					"filebeat.harvester",
-					nil, prometheus.Labels{"harvester": "open_files", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"harvester": "open_files", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Harvester.OpenFiles },
 				valType: prometheus.UntypedValue,
@@ -98,7 +98,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "harvester"),
 					"filebeat.harvester",
-					nil, prometheus.Labels{"harvester": "running", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"harvester": "running", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Harvester.Running },
 				valType: prometheus.UntypedValue,
@@ -107,7 +107,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "harvester"),
 					"filebeat.harvester",
-					nil, prometheus.Labels{"harvester": "skipped", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"harvester": "skipped", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Harvester.Skipped },
 				valType: prometheus.UntypedValue,
@@ -116,7 +116,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "harvester"),
 					"filebeat.harvester",
-					nil, prometheus.Labels{"harvester": "started", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"harvester": "started", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Harvester.Started },
 				valType: prometheus.UntypedValue,
@@ -125,7 +125,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_log"),
 					"filebeat.input_log",
-					nil, prometheus.Labels{"files": "renamed", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"files": "renamed", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Log.Files.Renamed },
 				valType: prometheus.UntypedValue,
@@ -134,7 +134,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_log"),
 					"filebeat.input_log",
-					nil, prometheus.Labels{"files": "truncated", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"files": "truncated", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Log.Files.Truncated },
 				valType: prometheus.UntypedValue,
@@ -143,7 +143,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow_flows"),
 					"filebeat.input_netflow",
-					nil, prometheus.Labels{"collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Flows },
 				valType: prometheus.UntypedValue,
@@ -152,7 +152,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow"),
 					"filebeat.input_netflow",
-					nil, prometheus.Labels{"packets": "dropped", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"packets": "dropped", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Packets.Dropped},
 				valType: prometheus.UntypedValue,
@@ -161,7 +161,7 @@ func NewFilebeatCollector(beatInfo *BeatInfo, stats *Stats) prometheus.Collector
 				desc: prometheus.NewDesc(
 					prometheus.BuildFQName(beatInfo.Beat, "filebeat", "input_netflow"),
 					"filebeat.input_netflow",
-					nil, prometheus.Labels{"packets": "received", "collector": beatInfo.CollectorLabel},
+					nil, prometheus.Labels{"packets": "received", "collector": collectorLabel},
 				),
 				eval:    func(stats *Stats) float64 { return stats.Filebeat.Input.Netflow.Packets.Received},
 				valType: prometheus.UntypedValue,
