@@ -70,10 +70,9 @@ type libbeatCollector struct {
 	beatInfo *BeatInfo
 	stats    *Stats
 	CollectorLabel string
+	libbeatOutputType *prometheus.Desc
 	metrics  exportedMetrics
 }
-
-var libbeatOutputType *prometheus.Desc
 
 // NewLibBeatCollector constructor
 func NewLibBeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string) prometheus.Collector {
@@ -81,6 +80,11 @@ func NewLibBeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string
 		beatInfo: beatInfo,
 		stats:    stats,
 		CollectorLabel: collectorLabel,
+		libbeatOutputType: prometheus.NewDesc(
+               prometheus.BuildFQName(beatInfo.Beat, "libbeat", "output_total"),
+               "libbeat.output.type",
+               []string{"type"}, prometheus.Labels{"collector": collectorLabel},
+        ),
 		metrics: exportedMetrics{
 			{
 				desc: prometheus.NewDesc(
@@ -372,19 +376,11 @@ func NewLibBeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string
 
 // Describe returns all descriptions of the collector.
 func (c *libbeatCollector) Describe(ch chan<- *prometheus.Desc) {
+	ch <- c.libbeatOutputType
 
 	for _, metric := range c.metrics {
 		ch <- metric.desc
 	}
-
-	libbeatOutputType = prometheus.NewDesc(
-		prometheus.BuildFQName(c.beatInfo.Beat, "libbeat", "output_total"),
-		"libbeat.output.type",
-		[]string{"type", "collector"}, nil,
-	)
-
-	ch <- libbeatOutputType
-
 }
 
 // Collect returns the current state of all metrics of the collector.
@@ -395,6 +391,6 @@ func (c *libbeatCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	// output.type with dynamic label
-	ch <- prometheus.MustNewConstMetric(libbeatOutputType, prometheus.CounterValue, float64(1), c.stats.LibBeat.Output.Type, c.CollectorLabel)
+	ch <- prometheus.MustNewConstMetric(c.libbeatOutputType, prometheus.CounterValue, float64(1), c.stats.LibBeat.Output.Type)
 
 }
