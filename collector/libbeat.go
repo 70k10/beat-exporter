@@ -69,7 +69,6 @@ type LibBeatPipeline struct {
 type libbeatCollector struct {
 	beatInfo *BeatInfo
 	stats    *Stats
-	CollectorLabel string
 	libbeatOutputType *prometheus.Desc
 	metrics  exportedMetrics
 }
@@ -79,7 +78,6 @@ func NewLibBeatCollector(beatInfo *BeatInfo, stats *Stats, collectorLabel string
 	return &libbeatCollector{
 		beatInfo: beatInfo,
 		stats:    stats,
-		CollectorLabel: collectorLabel,
 		libbeatOutputType: prometheus.NewDesc(
                prometheus.BuildFQName(beatInfo.Beat, "libbeat", "output_total"),
                "libbeat.output.type",
